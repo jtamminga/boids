@@ -1,4 +1,4 @@
-import { GameState, Renderable } from "./game";
+import { GameState, Renderable, Avoidable } from "./game";
 import Point from "./point";
 import Vector from "./vector";
 
@@ -16,6 +16,10 @@ export default abstract class GameElement implements Renderable {
 
     update(state: GameState) {
         this.pos.update(this.vector, state.delta)
+    }
+
+    distance(obj: Avoidable): number {
+        return obj.distance(this)
     }
 
     abstract render(state: GameState): void

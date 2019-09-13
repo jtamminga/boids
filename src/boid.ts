@@ -9,7 +9,7 @@ import Point from "./point";
 export default class Boid extends GameElement implements Vision {
     private navigator: Navigator
     private flight: FlightController
-    private debugRendering: boolean = true
+    private debugRendering: boolean = false
 
     readonly length: number = 15
     readonly width: number = 10

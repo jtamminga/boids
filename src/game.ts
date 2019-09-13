@@ -2,17 +2,22 @@ import Boid from './boid'
 import Fov from './fov';
 import Point from './point';
 import { toRadians } from './utils';
+import Wall from './wall';
+import GameElement from './element';
 
 let canvas = <HTMLCanvasElement> document.getElementById('game-canvas')
 const context = canvas.getContext('2d')
 
-export const BOID_SPEED = 0.03 // 0.01
+export const BOID_SPEED = 0.08 // 0.01
 const NUM_BOIDS = 50
 let boids: Boid[] = []
+let walls: Wall[] = []
 
 for (let i = 0; i < NUM_BOIDS; i++) {
     boids.push(generateBoid())
 }
+
+walls.push(new Wall(new Point(10,50), new Point(200,50)))
 
 // specific senerio
 // boids.push(new Boid(new Point(200, 400), BOID_SPEED, Math.PI * 7/4))
@@ -27,12 +32,17 @@ function step(time: number) {
     let state: GameState = {
         delta: time - preTime,
         context,
-        boids
+        boids,
+        walls
     }
 
     for (let i = 0; i < boids.length; i++) {
         boids[i].update(state)
         boids[i].render(state)
+    }
+
+    for (let i = 0; i < walls.length; i++) {
+        walls[i].render(state)
     }
 
     /*if (frameCount < 300)*/ window.requestAnimationFrame(step)
@@ -72,6 +82,7 @@ export interface GameState {
     readonly delta: number
     readonly context: CanvasRenderingContext2D
     readonly boids: Boid[]
+    readonly walls: Wall[]
 }
 
 export interface Renderable {
@@ -84,4 +95,8 @@ export interface Vision {
 
 export interface Clonable<T> {
     clone: () => T
+}
+
+export interface Avoidable {
+    distance(element: GameElement): number
 }

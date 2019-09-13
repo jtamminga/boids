@@ -10,7 +10,7 @@ export default class FlightController implements Renderable {
     private targeting: boolean = false
 
     private delta: number = 0
-    private duration: number = 1000
+    private duration: number = 400
 
     constructor(element: GameElement) {
         this.element = element
