@@ -3,6 +3,7 @@ import GameElement from "./element";
 import Point from "./point";
 import { NavigatorRequestor } from "./navigator";
 import { GameState, Vision, BOID_SPEED } from "./game";
+import Wall from "./wall";
 
 /**
  * Collision Behaviour V1
@@ -128,4 +129,10 @@ export function collision(aPos: Point, aVec: Vector, b: Point, padding: number =
     )    
 
     return e.distance(b) <= padding
+}
+
+function preventWallCollision(element: GameElement, wall: Wall): Vector {
+    
+
+    return null
 }

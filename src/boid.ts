@@ -9,7 +9,7 @@ import Point from "./point";
 export default class Boid extends GameElement implements Vision {
     private navigator: Navigator
     private flight: FlightController
-    private debugRendering: boolean = false
+    private debugRendering: boolean = true
 
     readonly length: number = 15
     readonly width: number = 10
@@ -20,9 +20,9 @@ export default class Boid extends GameElement implements Vision {
         this.fov = new Fov(this, Math.PI * (3/4), 60)
 
         const behaviours = [
-            CollisionBehaviourV2,
-            VectorMatchBehaviour,
-            CenteringBehaviour
+            // CollisionBehaviourV2,
+            // VectorMatchBehaviour,
+            // CenteringBehaviour
         ]
 
         this.navigator = new Navigator(this, behaviours)

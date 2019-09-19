@@ -64,3 +64,38 @@ export function toDegrees(radians: number): number {
 export function toRadians(degrees: number): number {
     return degrees * (Math.PI / 180) 
 }
+
+// Vector GetClosetPoint(Vector A, Vector B, Vector P, bool segmentClamp)
+// {
+//     Vector AP = P - A:
+//     Vector AB = B - A;
+//     float ab2 = AB.x * AB.x + AB.y * AB.y;
+//     float ap_ab = AP.x * AB.x + AP.y * AB.y;
+//     float t = ap_ab / ab2;
+//     if (segmentClamp) {
+//         if (t < 0.0f) t = 0.0f;
+//          else if (t > 1.0f) t = 1.0f;
+//     }
+//     Vector Closest = A + AB * t;
+//     return Closest;
+// }
+
+/**
+ * Find the closest point on a line going through A & B to point P
+ * @param p Point p, find closes point on line to this point
+ * @param a Start of line
+ * @param b End of line
+ * @param segmentClamp Clamp to the line to A & B
+ */
+export function closestPointLine(p: Point, a: Point, b: Point, segmentClamp: boolean = true): Point {
+    let ap = p.diff(a)
+    let ab = b.diff(a)
+    let ab2 = ab.x * ab.x + ab.y * ab.y
+    let apab = ap.x * ab.x + ap.y * ab.y
+    let t = apab / ab2
+    if (segmentClamp) {
+        if (t < 0) t = 0
+        else if (t > 1) t = 1
+    }
+    return ab.mult(t).add(a)
+}

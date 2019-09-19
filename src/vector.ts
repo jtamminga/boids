@@ -1,6 +1,7 @@
 import Point from "./point";
 import { Clonable } from "./game";
 import { angleWithin, InterpFunc, easeInOutCubic } from "./utils";
+import Wall from "./wall";
 
 export default class Vector implements Clonable<Vector> {
     public delta: Point
@@ -57,12 +58,26 @@ export default class Vector implements Clonable<Vector> {
         this.delta = this.unit.mult(v)
     }
 
+    // public static Vector2 Reflect(Vector2 vector, Vector2 normal) {
+    //     return vector - 2 * Vector2.Dot(vector, normal) * normal;
+    // }
+
     mult(n: number): Vector {
         return new Vector(this.delta.mult(n))
     }
 
+    dot(a: Vector): number {
+        return this.delta.x * a.delta.x + this.delta.y + a.delta.y
+    }
+
     opposite(): Vector {
         return new Vector(this.delta.mult(-1))
+    }
+
+    reflect(wall: Wall): Vector {
+        let wallNormal = wall.a.diff(wall.b).toVector().unit.toVector()
+
+        return this.delta.diff(wallNormal.mult(this.dot(wallNormal) * 2).delta).toVector()
     }
 
     similar(b: Vector, angleDiff: number = 0.01, speedDiff: number = 0.01): boolean {

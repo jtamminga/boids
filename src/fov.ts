@@ -1,6 +1,7 @@
 import GameElement from "./element";
 import { Renderable, GameState } from "./game";
 import { arcPoint, angleDiff, angle } from "./utils";
+import Wall from "./wall";
 
 export default class Fov implements Renderable {
     private angle: number
@@ -8,6 +9,7 @@ export default class Fov implements Renderable {
     readonly bubble: number = 20
     private element: GameElement
     private elementsFov: GameElement[]
+    private obsticlesFov: Wall[]
 
     constructor(element: GameElement, angle: number, range: number) {
         this.element = element
@@ -19,12 +21,19 @@ export default class Fov implements Renderable {
     /**
      * Get elements within field of view
      */
-    public get elements() : GameElement[] {
+    public get elements(): GameElement[] {
         return this.elementsFov
     }
+
+    
+    public get obsticals(): Wall[] {
+        return this.obsticlesFov
+    }
+    
     
     update(state: GameState) {
         this.elementsFov = this.inLineOfSight(state.boids)
+        this.obsticlesFov = this.wallInLineOfSite(state.walls)
     }
 
     render(state: GameState) {
@@ -47,6 +56,7 @@ export default class Fov implements Renderable {
         context.stroke()
 
         this.renderLos(state)
+        this.renderWallLos(state)
         this.renderBubble(state)
     }
 
@@ -59,6 +69,28 @@ export default class Fov implements Renderable {
             context.beginPath()
             context.moveTo(this.element.pos.x, this.element.pos.y)
             context.lineTo(this.elementsFov[i].pos.x, this.elementsFov[i].pos.y)
+            context.stroke()
+        }
+    }
+
+    renderWallLos({ context }: GameState): void {
+        context.strokeStyle = 'red'
+        for (let i = 0; i < this.obsticlesFov.length; i++) {
+            const closestPoint = this.obsticlesFov[i].closestTo(this.element)
+            const reflect = this.element.vector.reflect(this.obsticlesFov[i]).mult(1000).delta
+
+            context.strokeStyle = 'red' // temp
+            context.beginPath()
+            context.moveTo(this.element.pos.x, this.element.pos.y)
+            context.lineTo(closestPoint.x, closestPoint.y)
+            context.stroke()
+
+            // console.log('reflect', reflect.x, reflect.y);
+            
+            context.strokeStyle = 'green'
+            context.beginPath()
+            context.moveTo(closestPoint.x, closestPoint.y)
+            context.lineTo(closestPoint.x + reflect.x, closestPoint.y + reflect.y)
             context.stroke()
         }
     }
@@ -78,5 +110,14 @@ export default class Fov implements Renderable {
         return elements.filter(element => element != this.element &&
             this.element.pos.distance(element.pos) <= this.range &&
             angleDiff(this.element.vector.angle, angle(element.pos, this.element.pos)) < this.angle)
+    }
+
+    private wallInLineOfSite(walls: Wall[]): Wall[] {
+        return walls.filter(w => {
+            let closestPoint = w.closestTo(this.element)
+
+            return this.element.pos.distance(closestPoint) <= this.range &&
+                angleDiff(this.element.vector.angle, angle(closestPoint, this.element.pos)) < this.angle
+        })
     }
 }

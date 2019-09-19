@@ -1,11 +1,12 @@
 import { Renderable, GameState, Avoidable } from "./game";
 import Point from "./point";
 import GameElement from "./element";
+import { closestPointLine } from "./utils";
 
 /**
  * Line segment used to block elements
  */
-export default class Wall implements Renderable, Avoidable {
+export default class Wall implements Renderable {
     a: Point
     b: Point
 
@@ -23,7 +24,7 @@ export default class Wall implements Renderable, Avoidable {
         context.stroke()
     }
 
-    distance(element: GameElement): number {
-        throw new Error("Method not implemented.");
+    closestTo(element: GameElement): Point {
+        return closestPointLine(element.pos, this.a, this.b)
     }
 }

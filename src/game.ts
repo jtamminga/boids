@@ -8,8 +8,8 @@ import GameElement from './element';
 let canvas = <HTMLCanvasElement> document.getElementById('game-canvas')
 const context = canvas.getContext('2d')
 
-export const BOID_SPEED = 0.08 // 0.01
-const NUM_BOIDS = 50
+export const BOID_SPEED = 0.03 // 0.08 pree good
+const NUM_BOIDS = 10 // 50 nice
 let boids: Boid[] = []
 let walls: Wall[] = []
 
