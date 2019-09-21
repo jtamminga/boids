@@ -4,6 +4,7 @@ import Point from "./point";
 import { NavigatorRequestor } from "./navigator";
 import { GameState, Vision, BOID_SPEED } from "./game";
 import Wall from "./wall";
+import { angleDiff } from "./utils";
 
 /**
  * Collision Behaviour V1
@@ -37,7 +38,8 @@ export const CollisionBehaviour: NavigatorRequestor =
 export const CollisionBehaviourV2: NavigatorRequestor =
     (element: GameElement & Vision, state: GameState): Vector => {
 
-    if (element.fov.elements.length == 0) return element.vector.clone()
+    if (element.fov.elements.length == 0 && element.fov.obsticals.length == 0)
+        return element.vector.clone()
 
     let vectors: Vector[] = []
     for (const e of element.fov.elements) {
@@ -45,6 +47,12 @@ export const CollisionBehaviourV2: NavigatorRequestor =
             let v = new Vector(e.pos.diff(element.pos).mult(-1), BOID_SPEED)
             vectors.push(v)
         }
+    }
+
+    for (const ob of element.fov.obsticals) {
+        let reflected = element.vector.reflect(ob)
+        let v = new Vector(reflected.delta.add(element.vector.delta), BOID_SPEED)
+        vectors.push(v)
     }
 
     if (vectors.length == 0) return element.vector.clone()

@@ -67,7 +67,7 @@ export default class Vector implements Clonable<Vector> {
     }
 
     dot(a: Vector): number {
-        return this.delta.x * a.delta.x + this.delta.y + a.delta.y
+        return (this.delta.x * a.delta.x) + (this.delta.y * a.delta.y)
     }
 
     opposite(): Vector {
@@ -75,9 +75,10 @@ export default class Vector implements Clonable<Vector> {
     }
 
     reflect(wall: Wall): Vector {
-        let wallNormal = wall.a.diff(wall.b).toVector().unit.toVector()
+        let n = wall.a.diff(wall.b).toVector().unit.toVector()        
 
-        return this.delta.diff(wallNormal.mult(this.dot(wallNormal) * 2).delta).toVector()
+        let r = this.delta.diff(n.mult(this.dot(n) * 2).delta)
+        return r.mult(-1).toVector()
     }
 
     similar(b: Vector, angleDiff: number = 0.01, speedDiff: number = 0.01): boolean {

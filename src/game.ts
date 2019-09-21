@@ -13,14 +13,14 @@ const NUM_BOIDS = 10 // 50 nice
 let boids: Boid[] = []
 let walls: Wall[] = []
 
-for (let i = 0; i < NUM_BOIDS; i++) {
-    boids.push(generateBoid())
-}
+// for (let i = 0; i < NUM_BOIDS; i++) {
+//     boids.push(generateBoid())
+// }
 
-walls.push(new Wall(new Point(10,50), new Point(200,50)))
+walls.push(new Wall(new Point(200,0), new Point(200,50)))
 
 // specific senerio
-// boids.push(new Boid(new Point(200, 400), BOID_SPEED, Math.PI * 7/4))
+boids.push(new Boid(new Point(200, 200), BOID_SPEED, toRadians(270)))
 // boids.push(new Boid(new Point(300, 400), BOID_SPEED, Math.PI * 5/4))
 // boids.push(new Boid(new Point(100, 100), 0.01, toRadians(45)))
 
@@ -45,22 +45,22 @@ function step(time: number) {
         walls[i].render(state)
     }
 
-    /*if (frameCount < 300)*/ window.requestAnimationFrame(step)
+    // /*if (frameCount < 300)*/ window.requestAnimationFrame(step)
     
     preTime = time
     frameCount++
 }
 
-window.requestAnimationFrame(step)
+// window.requestAnimationFrame(step)
 
 //
 // Events
 //
 
-// window.addEventListener("keydown", e => {
-//     preTime = 0
-//     step(50)
-// })
+window.addEventListener("keydown", e => {
+    preTime = 0
+    step(50)
+})
 
 //
 // functions

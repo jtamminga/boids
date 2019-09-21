@@ -20,7 +20,7 @@ export default class Boid extends GameElement implements Vision {
         this.fov = new Fov(this, Math.PI * (3/4), 60)
 
         const behaviours = [
-            // CollisionBehaviourV2,
+            CollisionBehaviourV2
             // VectorMatchBehaviour,
             // CenteringBehaviour
         ]
