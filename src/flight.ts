@@ -10,7 +10,7 @@ export default class FlightController implements Renderable {
     private targeting: boolean = false
 
     private delta: number = 0
-    private duration: number = 400 // 400 good value
+    private duration: number = 200 // 400 good value
 
     constructor(element: GameElement) {
         this.element = element
@@ -33,11 +33,11 @@ export default class FlightController implements Renderable {
             this.element.vector = Vector.interp(this.start, this.target, t)
 
             // trying a clamp
-            this.element.vector.speed = clamp(
-                this.element.vector.speed,
-                BOID_SPEED - (BOID_SPEED * 0.1),
-                BOID_SPEED
-            )
+            // this.element.vector.speed = clamp(
+            //     this.element.vector.speed,
+            //     BOID_SPEED - (BOID_SPEED * 0.5),
+            //     BOID_SPEED
+            // )
 
             if (this.delta > this.duration) {
                 this.element.vector = this.target.clone()
@@ -45,6 +45,11 @@ export default class FlightController implements Renderable {
                 this.delta = 0
             }
         }
+
+        // hmm not sure,
+        // when i clamp, all boids just eventually reach the lower limit
+        // for now just set the boid speed
+        this.element.vector.speed = BOID_SPEED
     }
 
     render({ context }: GameState): void {

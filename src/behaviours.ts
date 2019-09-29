@@ -1,30 +1,17 @@
 import Vector from "./vector";
 import GameElement from "./element";
-import Point from "./point";
 import { NavigatorRequestor } from "./navigator";
-import { GameState, Vision, BOID_SPEED } from "./game";
-import Wall from "./wall";
-import { angleDiff } from "./utils";
+import { Vision, BOID_SPEED } from "./game";
 
-/**
- * Collision Behaviour V1
- * This strategy is looking directly ahead within vision range
- * and checking that the path is clear.
- * It also checks to make sure no one else is within its bubble
- */
-export const CollisionBehaviour: NavigatorRequestor =
-    (element: GameElement & Vision, state: GameState): Vector => {
+export const ObsAvoidanceBehaviour: NavigatorRequestor =
+    (element: GameElement & Vision): Vector => {
 
-    if (element.fov.elements.length == 0) return element.vector
-
-    const heading = preventHeadingCollision(element)
-
-    let vectors: Vector[] = [heading]
-    for (const e of element.fov.elements) {
-        if (element.pos.distance(e.pos) < element.fov.bubble * 2) {
-            let v = new Vector(e.pos.diff(element.pos).mult(-1), BOID_SPEED)
-            vectors.push(v)
-        }
+    if (element.fov.obsticals.length == 0)
+        return null
+    
+    let vectors: Vector[] = []
+    for (const ob of element.fov.obsticals) {
+        vectors.push(ob.force(element))
     }
 
     return Vector.mean(vectors)
@@ -36,10 +23,10 @@ export const CollisionBehaviour: NavigatorRequestor =
  * other elements don't go within the bubble.
  */
 export const CollisionBehaviourV2: NavigatorRequestor =
-    (element: GameElement & Vision, state: GameState): Vector => {
+    (element: GameElement & Vision): Vector => {
 
-    if (element.fov.elements.length == 0 && element.fov.obsticals.length == 0)
-        return element.vector.clone()
+    if (element.fov.elements.length == 0)
+        return null
 
     let vectors: Vector[] = []
     for (const e of element.fov.elements) {
@@ -49,13 +36,9 @@ export const CollisionBehaviourV2: NavigatorRequestor =
         }
     }
 
-    for (const ob of element.fov.obsticals) {
-        let reflected = element.vector.reflect(ob)
-        let v = new Vector(reflected.delta.add(element.vector.delta), BOID_SPEED)
-        vectors.push(v)
-    }
+    if (vectors.length == 0)
+        return null
 
-    if (vectors.length == 0) return element.vector.clone()
     return Vector.mean(vectors)
 }
 
@@ -65,14 +48,17 @@ export const CollisionBehaviourV2: NavigatorRequestor =
  * TODO: Still need to add in weighted averages based on the the distance.
  */
 export const VectorMatchBehaviour: NavigatorRequestor =
-    (element: GameElement & Vision, state: GameState): Vector => {
+    (element: GameElement & Vision): Vector => {
 
-    if (element.fov.elements.length == 0) return element.vector
+    if (element.fov.elements.length == 0)
+        return null
 
-    let vectors = element.fov.elements.map(e => e.vector)
-    let vectorMatch = Vector.mean(vectors)
+    let vectors = element.fov.elements.map(e => {
+        let str = 1 - (e.pos.distance(element.pos) / element.fov.range)
+        return e.vector.mult(str)
+    })
 
-    return vectorMatch
+    return Vector.mean(vectors)
 }
 
 /**
@@ -82,65 +68,15 @@ export const VectorMatchBehaviour: NavigatorRequestor =
  * TODO: Maybe need to head towards "center of mass" *shrug
  */
 export const CenteringBehaviour: NavigatorRequestor =
-    (element: GameElement & Vision, state: GameState): Vector => {
+    (element: GameElement & Vision): Vector => {
     
-    if (element.fov.elements.length == 0) return element.vector
+    if (element.fov.elements.length == 0) return null
 
     let vectors = element.fov.elements.map(e => {
         let dir = e.pos.diff(element.pos)
-        // str based on inverse of distance
         let str = 1 - (dir.distance() / element.fov.range)
-        return new Vector(e.pos.diff(element.pos), str * BOID_SPEED)
+        return new Vector(dir, str * BOID_SPEED)
     })
 
     return Vector.mean(vectors)
-}
-
-//
-// Helpers
-//
-
-export function preventHeadingCollision(element: GameElement & Vision): Vector {
-    const angleStep = 0.0873 // ~5 degrees
-
-    // random values causing sparatic/twitching motion
-    // boid will need some 'momentum' so if moving in a direction
-    // will make the boid tend in the direction more often
-    // const startSign = Math.random() > 0.5 ? 1 : -1
-    const startSign = 1
-    let curAngle = element.vector.angle
-    let curVec = element.vector.clone()
-
-
-    for (let i = 1; i < 20; i++) {
-        let willHit = element.fov.elements.some(other =>
-            collision(element.pos, curVec, other.pos, 20))
-
-        if (willHit) {
-            let newAngle = curAngle + (Math.ceil(i / 2) * angleStep * (i % 2 == 0 ? startSign : -startSign))
-            curVec.angle = newAngle
-        } else {
-            break
-        }
-    }
-
-    return curVec
-}
-
-export function collision(aPos: Point, aVec: Vector, b: Point, padding: number = 0.01): boolean {
-    let t = (aVec.unit.x * (b.x - aPos.x)) +
-        (aVec.unit.y * (b.y - aPos.y))
-
-    let e = new Point(
-        t * aVec.unit.x + aPos.x,
-        t * aVec.unit.y + aPos.y
-    )    
-
-    return e.distance(b) <= padding
-}
-
-function preventWallCollision(element: GameElement, wall: Wall): Vector {
-    
-
-    return null
 }

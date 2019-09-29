@@ -1,7 +1,7 @@
 import GameElement from "./element";
-import { GameState, Vision } from "./game";
+import { GameState, Vision, DEBUG_MODE } from "./game";
 import Fov from "./fov";
-import { VectorMatchBehaviour, CenteringBehaviour, CollisionBehaviourV2 } from "./behaviours";
+import { VectorMatchBehaviour, CenteringBehaviour, CollisionBehaviourV2, ObsAvoidanceBehaviour } from "./behaviours";
 import Navigator from "./navigator";
 import FlightController from "./flight";
 import Point from "./point";
@@ -9,7 +9,6 @@ import Point from "./point";
 export default class Boid extends GameElement implements Vision {
     private navigator: Navigator
     private flight: FlightController
-    private debugRendering: boolean = true
 
     readonly length: number = 15
     readonly width: number = 10
@@ -17,12 +16,13 @@ export default class Boid extends GameElement implements Vision {
 
     constructor(pos: Point, speed: number = 0, direction: number = 0) {
         super(pos, speed, direction)
-        this.fov = new Fov(this, Math.PI * (3/4), 60)
+        this.fov = new Fov(this, Math.PI * (3/4), 100) // originally range: 60
 
         const behaviours = [
-            CollisionBehaviourV2
-            // VectorMatchBehaviour,
-            // CenteringBehaviour
+            ObsAvoidanceBehaviour,
+            CollisionBehaviourV2,
+            VectorMatchBehaviour,
+            CenteringBehaviour
         ]
 
         this.navigator = new Navigator(this, behaviours)
@@ -53,7 +53,7 @@ export default class Boid extends GameElement implements Vision {
     render(state: GameState) {
         const { context } = state
 
-        if (this.debugRendering) {
+        if (DEBUG_MODE) {
             this.fov.render(state)
             this.flight.render(state)
         }

@@ -58,8 +58,8 @@ export default class Point implements Clonable<Point> {
         this.y += vector.delta.y * delta
     }
 
-    apply(delta: Point): Point {
-        return new Point(this.x * delta.x, this.y * delta.y)
+    apply({ delta}: Vector): Point {
+        return new Point(this.x + delta.x, this.y + delta.y)
     }
 
     toVector(): Vector {

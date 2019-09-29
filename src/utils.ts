@@ -99,3 +99,7 @@ export function closestPointLine(p: Point, a: Point, b: Point, segmentClamp: boo
     }
     return ab.mult(t).add(a)
 }
+
+export function min(arr: number[]): number {
+    return arr.reduce((min, i) => i < min ? i : min)
+}

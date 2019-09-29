@@ -2,30 +2,32 @@ import Boid from './boid'
 import Fov from './fov';
 import Point from './point';
 import { toRadians } from './utils';
-import Wall from './wall';
 import GameElement from './element';
+import Editor from './editor';
+import Obsticle from './obsticle';
 
-let canvas = <HTMLCanvasElement> document.getElementById('game-canvas')
+export const DEBUG_MODE = false
+export const BOID_SPEED = 0.08 // 0.08 pree good
+const NUM_BOIDS = 50 // 50 nice
+
+const canvas = <HTMLCanvasElement> document.getElementById('game-canvas')
 const context = canvas.getContext('2d')
 
-export const BOID_SPEED = 0.03 // 0.08 pree good
-const NUM_BOIDS = 10 // 50 nice
 let boids: Boid[] = []
-let walls: Wall[] = []
+let obsticles: Obsticle[] = []
 
-// for (let i = 0; i < NUM_BOIDS; i++) {
-//     boids.push(generateBoid())
-// }
+const editor = new Editor(obs => obsticles.push(obs))
 
-walls.push(new Wall(new Point(200,0), new Point(200,50)))
+for (let i = 0; i < NUM_BOIDS; i++) {
+    boids.push(generateBoid())
+}
 
 // specific senerio
-boids.push(new Boid(new Point(200, 200), BOID_SPEED, toRadians(270)))
-// boids.push(new Boid(new Point(300, 400), BOID_SPEED, Math.PI * 5/4))
-// boids.push(new Boid(new Point(100, 100), 0.01, toRadians(45)))
+// boids.push(new Boid(new Point(100, 150), BOID_SPEED, toRadians(0)))
 
 let preTime = 0
-let frameCount = 0
+let running = true
+
 function step(time: number) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -33,7 +35,7 @@ function step(time: number) {
         delta: time - preTime,
         context,
         boids,
-        walls
+        obsticles
     }
 
     for (let i = 0; i < boids.length; i++) {
@@ -41,25 +43,28 @@ function step(time: number) {
         boids[i].render(state)
     }
 
-    for (let i = 0; i < walls.length; i++) {
-        walls[i].render(state)
+    for (let i = 0; i < obsticles.length; i++) {
+        obsticles[i].render(state)
     }
 
-    // /*if (frameCount < 300)*/ window.requestAnimationFrame(step)
+    editor.render(state)
+
+    if (running) window.requestAnimationFrame(step)
     
     preTime = time
-    frameCount++
 }
 
-// window.requestAnimationFrame(step)
+window.requestAnimationFrame(step)
 
 //
 // Events
 //
 
 window.addEventListener("keydown", e => {
-    preTime = 0
-    step(50)
+    // preTime = 0
+    // step(50)
+    // window.requestAnimationFrame(step)
+    if (e.keyCode == 32) running = false
 })
 
 //
@@ -82,7 +87,7 @@ export interface GameState {
     readonly delta: number
     readonly context: CanvasRenderingContext2D
     readonly boids: Boid[]
-    readonly walls: Wall[]
+    readonly obsticles: Obsticle[]
 }
 
 export interface Renderable {
