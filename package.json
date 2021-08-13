@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "webpack && open index.html",
     "bundle": "webpack"
   },
   "author": "",

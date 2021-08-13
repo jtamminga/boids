@@ -1,10 +1,10 @@
 import Boid from './boid'
 import Fov from './fov';
 import Point from './point';
-import { toRadians } from './utils';
 import GameElement from './element';
 import Editor from './editor';
 import Obsticle from './obsticle';
+import { toRadians } from './utils';
 
 export const DEBUG_MODE = false
 export const BOID_SPEED = 0.08 // 0.08 pree good
@@ -23,7 +23,13 @@ for (let i = 0; i < NUM_BOIDS; i++) {
 }
 
 // specific senerio
-// boids.push(new Boid(new Point(100, 150), BOID_SPEED, toRadians(0)))
+// boids.push(new Boid(new Point(300, 150), BOID_SPEED, toRadians(1)))
+// obsticles.push(new Obsticle([
+//     new Point(500, 100),
+//     new Point(600, 100),
+//     new Point(600, 200),
+//     new Point(500, 200)
+// ]))
 
 let preTime = 0
 let running = true

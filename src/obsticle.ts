@@ -57,8 +57,8 @@ export default class Obsticle implements Renderable, Avoidable {
 
     force(element: GameElement & Vision): Vector {
         let { closest, distance, segments } = this.calc(element.pos)
-        let mult = 1 - (distance / (element.fov.range * 1.3))
-        return Vector.mean(segments.map(s => s.vector)).mult(BOID_SPEED * mult)
+        let mult = element.fov.range - (Math.pow(distance, 2) / element.fov.range)
+        return Vector.mean(segments.map(s => s.vector)).mult(mult * BOID_SPEED * 0.01)
     }
 
     render({ context }: GameState) {
